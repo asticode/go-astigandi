@@ -6,7 +6,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/asticode/go-astitools/http"
+	"github.com/asticode/go-astikit"
 	"github.com/pkg/errors"
 )
 
@@ -17,14 +17,14 @@ const (
 // Client represents the client
 type Client struct {
 	apiKey string
-	s      *astihttp.Sender
+	s      *astikit.HTTPSender
 }
 
 // New creates a new client
 func New(c Configuration) *Client {
 	return &Client{
 		apiKey: c.APIKey,
-		s:      astihttp.NewSender(c.Sender),
+		s:      astikit.NewHTTPSender(c.Sender),
 	}
 }
 
