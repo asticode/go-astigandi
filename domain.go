@@ -1,9 +1,8 @@
 package astigandi
 
 import (
+	"fmt"
 	"net/http"
-
-	"github.com/pkg/errors"
 )
 
 // Domain represents a domain
@@ -21,7 +20,7 @@ type Domain struct {
 func (c *Client) Domains() (ds []Domain, err error) {
 	// Send
 	if err = c.send(http.MethodGet, "/domains", nil, &ds); err != nil {
-		err = errors.Wrap(err, "astigandi: sending failed")
+		err = fmt.Errorf("astigandi: sending failed: %w", err)
 		return
 	}
 	return
@@ -31,7 +30,7 @@ func (c *Client) Domains() (ds []Domain, err error) {
 func (c *Client) Domain(fqdn string) (d Domain, err error) {
 	// Send
 	if err = c.send(http.MethodGet, "/domains/"+fqdn, nil, &d); err != nil {
-		err = errors.Wrap(err, "astigandi: sending failed")
+		err = fmt.Errorf("astigandi: sending failed: %w", err)
 		return
 	}
 	return

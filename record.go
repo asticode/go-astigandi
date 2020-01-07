@@ -1,9 +1,8 @@
 package astigandi
 
 import (
+	"fmt"
 	"net/http"
-
-	"github.com/pkg/errors"
 )
 
 // Rrset types
@@ -27,7 +26,7 @@ type Record struct {
 func (c *Client) DomainRecords(fqdn string) (rs []Record, err error) {
 	// Send
 	if err = c.send(http.MethodGet, "/domains/"+fqdn+"/records", nil, &rs); err != nil {
-		err = errors.Wrap(err, "astigandi: sending failed")
+		err = fmt.Errorf("astigandi: sending failed: %w", err)
 		return
 	}
 	return
@@ -37,7 +36,7 @@ func (c *Client) DomainRecords(fqdn string) (rs []Record, err error) {
 func (c *Client) CreateDomainRecord(fqdn string, r Record) (err error) {
 	// Send
 	if err = c.send(http.MethodPost, "/domains/"+fqdn+"/records", r, nil); err != nil {
-		err = errors.Wrap(err, "astigandi: sending failed")
+		err = fmt.Errorf("astigandi: sending failed: %w", err)
 		return
 	}
 	return
@@ -46,7 +45,7 @@ func (c *Client) CreateDomainRecord(fqdn string, r Record) (err error) {
 // RemoveDomainRecords removes the domain's records
 func (c *Client) RemoveDomainRecords(fqdn string, filter Record) (err error) {
 	// Create url
-	url := "/domains/"+fqdn+"/records"
+	url := "/domains/" + fqdn + "/records"
 	if filter.RrsetName != "" {
 		url += "/" + filter.RrsetName
 		if filter.RrsetType != "" {
@@ -56,7 +55,7 @@ func (c *Client) RemoveDomainRecords(fqdn string, filter Record) (err error) {
 
 	// Send
 	if err = c.send(http.MethodDelete, url, nil, nil); err != nil {
-		err = errors.Wrap(err, "astigandi: sending failed")
+		err = fmt.Errorf("astigandi: sending failed: %w", err)
 		return
 	}
 	return

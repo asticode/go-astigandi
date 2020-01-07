@@ -3,11 +3,11 @@ package astigandi
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 
 	"github.com/asticode/go-astikit"
-	"github.com/pkg/errors"
 )
 
 const (
@@ -35,7 +35,7 @@ func (c *Client) send(method, url string, reqPayload, respPayload interface{}) (
 		// Marshal
 		buf := &bytes.Buffer{}
 		if err = json.NewEncoder(buf).Encode(reqPayload); err != nil {
-			err = errors.Wrapf(err, "astigandi: marshaling payload of %s request to %s failed", method, url)
+			err = fmt.Errorf("astigandi: marshaling payload of %s request to %s failed: %w", method, url, err)
 			return
 		}
 
@@ -46,7 +46,7 @@ func (c *Client) send(method, url string, reqPayload, respPayload interface{}) (
 	// Create request
 	var req *http.Request
 	if req, err = http.NewRequest(method, baseURL+url, body); err != nil {
-		err = errors.Wrapf(err, "astigandi: creating %s request to %s failed", method, url)
+		err = fmt.Errorf("astigandi: creating %s request to %s failed: %w", method, url, err)
 		return
 	}
 
@@ -59,7 +59,7 @@ func (c *Client) send(method, url string, reqPayload, respPayload interface{}) (
 	// Send
 	var resp *http.Response
 	if resp, err = c.s.Send(req); err != nil {
-		err = errors.Wrapf(err, "astigandi: sending %s request to %s failed", req.Method, req.URL.Path)
+		err = fmt.Errorf("astigandi: sending %s request to %s failed: %w", req.Method, req.URL.Path, err)
 		return
 	}
 	defer resp.Body.Close()
@@ -69,7 +69,7 @@ func (c *Client) send(method, url string, reqPayload, respPayload interface{}) (
 		// Unmarshal
 		var e Error
 		if err = json.NewDecoder(resp.Body).Decode(&e); err != nil {
-			err = errors.Wrap(err, "astigandi: unmarshaling error failed")
+			err = fmt.Errorf("astigandi: unmarshaling error failed: %w", err)
 			return
 		}
 
@@ -81,7 +81,7 @@ func (c *Client) send(method, url string, reqPayload, respPayload interface{}) (
 	// Unmarshal
 	if respPayload != nil {
 		if err = json.NewDecoder(resp.Body).Decode(respPayload); err != nil {
-			err = errors.Wrap(err, "astigandi: unmarshaling failed")
+			err = fmt.Errorf("astigandi: unmarshaling failed: %w", err)
 			return
 		}
 	}
